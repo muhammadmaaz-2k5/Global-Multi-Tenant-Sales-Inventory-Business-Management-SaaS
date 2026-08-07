@@ -82,10 +82,10 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 7: Supply Chain & CRM
 **Goal:** Track who buys from the business and who the business buys from.
-- [ ] **Story 7.1:** As a cashier, I can attach a Customer profile to a POS sale for loyalty tracking.
-- [ ] **Story 7.2:** As a manager, I can create Supplier profiles.
-- [ ] **Story 7.3:** As a manager, I can generate a Purchase Order and send it to a Supplier.
-- [ ] **Story 7.4:** As a manager, I can receive a Purchase Order, which automatically increases inventory.
+- [x] **Story 7.1:** As an owner, I can create and manage Suppliers and their contact details.
+- [x] **Story 7.2:** As an owner, I can create Purchase Orders (POs) to restock from suppliers.
+- [x] **Story 7.3:** As an owner, I can receive a PO and automatically increase inventory stock.
+- [x] **Story 7.4:** As a cashier, I can optionally attach a Customer profile to a sale to track loyalty.
 
 ### SPRINT 8: Financials & Accounting
 **Goal:** Track business profitability and cash flow.

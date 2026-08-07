@@ -25,6 +25,12 @@ interface Location {
   type: string;
 }
 
+interface Customer {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 interface CartItem {
   variantId: string;
   name: string;
@@ -38,6 +44,8 @@ export default function PosPage() {
   const [orgId, setOrgId] = useState<string>('');
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
@@ -55,13 +63,15 @@ export default function PosPage() {
         if (id) {
           setOrgId(id);
           
-          const [prods, locs] = await Promise.all([
+          const [prods, locs, custs] = await Promise.all([
             fetchApi<Product[]>(`/organizations/${id}/products`),
             fetchApi<Location[]>(`/organizations/${id}/locations`),
+            fetchApi<Customer[]>(`/organizations/${id}/customers`),
           ]);
           
           setProducts(prods);
           setLocations(locs);
+          setCustomers(custs);
           if (locs.length > 0) {
             setSelectedLocationId(locs[0].id);
           }
@@ -145,6 +155,7 @@ export default function PosPage() {
           locationId: selectedLocationId,
           paymentMethod,
           items: cart,
+          customerId: selectedCustomerId || undefined,
         }),
       });
       
@@ -191,6 +202,21 @@ export default function PosPage() {
             >
               {locations.map((loc) => (
                 <option key={loc.id} value={loc.id}>{loc.name} ({loc.type})</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Customer Selector */}
+          <div className="shrink-0 flex items-center gap-2 bg-surface-100 p-2 rounded-lg border border-surface-200">
+            <span className="text-sm font-medium text-surface-600">Customer:</span>
+            <select 
+              value={selectedCustomerId}
+              onChange={(e) => setSelectedCustomerId(e.target.value)}
+              className="bg-transparent border-none text-sm font-bold text-surface-900 focus:outline-none focus:ring-0"
+            >
+              <option value="">Walk-in Customer</option>
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
               ))}
             </select>
           </div>

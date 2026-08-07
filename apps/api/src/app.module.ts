@@ -13,6 +13,9 @@ import { LocationsModule } from './locations/locations.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { PosCartsModule } from './pos-carts/pos-carts.module';
 import { OrdersModule } from './orders/orders.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
+import { CustomersModule } from './customers/customers.module';
+import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { OrdersModule } from './orders/orders.module';
     InventoryModule,
     PosCartsModule,
     OrdersModule,
+    SuppliersModule,
+    CustomersModule,
+    PurchaseOrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
