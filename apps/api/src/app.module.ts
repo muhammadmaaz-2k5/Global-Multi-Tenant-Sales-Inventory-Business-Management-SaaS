@@ -6,6 +6,12 @@ import { AuthModule } from './auth/auth.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { UsersModule } from './users/users.module';
 import { CacheModule } from './cache/cache.module';
+import { CategoriesModule } from './categories/categories.module';
+import { BrandsModule } from './brands/brands.module';
+import { ProductsModule } from './products/products.module';
+import { LocationsModule } from './locations/locations.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { PosCartsModule } from './pos-carts/pos-carts.module';
 
 @Module({
   imports: [
@@ -14,6 +20,12 @@ import { CacheModule } from './cache/cache.module';
     OrganizationsModule,
     UsersModule,
     CacheModule,
+    CategoriesModule,
+    BrandsModule,
+    ProductsModule,
+    LocationsModule,
+    InventoryModule,
+    PosCartsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

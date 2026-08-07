@@ -9,6 +9,9 @@
       "dependsOn": ["^generate"],
       "outputs": ["node_modules/.prisma/**"]
     },
+    "push": {
+      "dependsOn": ["^push"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },

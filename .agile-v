@@ -1,0 +1,132 @@
+# SHOPFLOW AGILE PROJECT MODEL (.agile-v)
+
+This document serves as the master Agile framework and Product Backlog for the **ShopFlow Multi-Tenant SaaS Platform**. It defines the complete project lifecycle using industry-standard Agile and Scrum methodologies.
+
+---
+
+## 1. AGILE FRAMEWORK OVERVIEW
+
+- **Methodology:** Scrum (2-Week Sprints)
+- **Roles:**
+  - **Product Owner:** Defines requirements, prioritizes backlog.
+  - **Scrum Master:** Facilitates ceremonies, removes blockers.
+  - **Development Team:** Full-stack engineers, DevOps, QA.
+- **Ceremonies:**
+  - Sprint Planning (Day 1)
+  - Daily Standup (Daily, 15 mins)
+  - Sprint Review (Last Day - Demo to stakeholders)
+  - Sprint Retrospective (Last Day - Process improvement)
+- **Estimation:** Fibonacci Sequence (1, 2, 3, 5, 8, 13) for Story Points.
+
+---
+
+## 2. PRODUCT EPICS
+
+- **EPIC 1:** Foundation & Multi-Tenant Core
+- **EPIC 2:** Product Catalog & Inventory
+- **EPIC 3:** Point of Sale (POS) & Sales Management
+- **EPIC 4:** Customers & CRM
+- **EPIC 5:** Supply Chain (Purchases & Suppliers)
+- **EPIC 6:** Financials (Payments, Expenses, Invoices)
+- **EPIC 7:** Human Resources & Access Control (RBAC)
+- **EPIC 8:** Reporting & Business Intelligence
+- **EPIC 9:** Notifications & Audit Logs
+- **EPIC 10:** Subscriptions & SaaS Billing
+- **EPIC 11:** DevOps, Infrastructure & AI
+
+---
+
+## 3. DETAILED SPRINT BACKLOG
+
+### SPRINT 1: Monorepo & Infrastructure Foundation
+**Goal:** Establish the technical foundation for the project.
+- [x] **Task 1:** Initialize Turborepo with Next.js (Web) and NestJS (API).
+- [x] **Task 2:** Setup PostgreSQL and Redis via Docker Compose.
+- [x] **Task 3:** Configure Prisma ORM and define base schema.
+- [x] **Task 4:** Setup CI/CD Pipeline (GitHub Actions).
+
+### SPRINT 2: Authentication & SaaS Core
+**Goal:** Enable secure user login and strict multi-tenant isolation.
+- [x] **Story 2.1:** As a user, I can register using my email and password.
+- [x] **Story 2.2:** As a user, I can log in and receive a JWT.
+- [x] **Story 2.3:** As a business owner, when I register, an Organization is automatically created.
+- [x] **Story 2.4:** As a developer, I must ensure API endpoints strictly filter data by `organizationId`.
+
+### SPRINT 3: Product Catalog & Brand Management
+**Goal:** Allow users to define the products they sell.
+- [ ] **Story 3.1:** As a manager, I can create, update, and delete Categories.
+- [ ] **Story 3.2:** As a manager, I can create Brands.
+- [ ] **Story 3.3:** As a manager, I can create a Product with a name, SKU, barcode, and base price.
+- [ ] **Story 3.4:** As a manager, I can add Product Variants (e.g., Size: Large, Color: Red).
+
+### SPRINT 4: Warehouses & Inventory Tracking
+**Goal:** Manage stock levels across different locations.
+- [ ] **Story 4.1:** As an owner, I can create multiple Stores and Warehouses.
+- [ ] **Story 4.2:** As a manager, I can view current stock levels for any product at any location.
+- [ ] **Story 4.3:** As a manager, I can manually adjust stock levels (e.g., for damaged goods).
+- [ ] **Story 4.4:** As a manager, I can transfer stock between a Warehouse and a Store.
+
+### SPRINT 5: Point of Sale (POS) Interface
+**Goal:** Provide a fast, responsive interface for cashiers to process sales.
+- [x] **Story 5.1:** As a cashier, I can search for products by name or barcode scanner.
+- [x] **Story 5.2:** As a cashier, I can add items to the cart and see the subtotal, tax, and total.
+- [x] **Story 5.3:** As a cashier, I can apply a line-item discount or an overall cart discount.
+- [x] **Story 5.4:** As a cashier, I can suspend a sale (hold cart) and retrieve it later.
+
+### SPRINT 6: Sales Transactions & Order Processing
+**Goal:** Finalize checkout and guarantee data consistency.
+- [ ] **Story 6.1:** As a cashier, I can accept payment via Cash, Card, or Custom method.
+- [ ] **Story 6.2:** As the system, I must decrement inventory atomically when a sale is completed.
+- [ ] **Story 6.3:** As a cashier, I can print or email a digital receipt.
+- [ ] **Story 6.4:** As a manager, I can process a refund and return items to inventory.
+
+### SPRINT 7: Supply Chain & CRM
+**Goal:** Track who buys from the business and who the business buys from.
+- [ ] **Story 7.1:** As a cashier, I can attach a Customer profile to a POS sale for loyalty tracking.
+- [ ] **Story 7.2:** As a manager, I can create Supplier profiles.
+- [ ] **Story 7.3:** As a manager, I can generate a Purchase Order and send it to a Supplier.
+- [ ] **Story 7.4:** As a manager, I can receive a Purchase Order, which automatically increases inventory.
+
+### SPRINT 8: Financials & Accounting
+**Goal:** Track business profitability and cash flow.
+- [ ] **Story 8.1:** As an owner, I can log daily operational Expenses (e.g., electricity, salaries).
+- [ ] **Story 8.2:** As a B2B user, I can generate an Invoice for a customer and track its payment status (Paid, Unpaid, Overdue).
+- [ ] **Story 8.3:** As an owner, I can view a Profit & Loss (P&L) statement based on sales, COGS, and expenses.
+
+### SPRINT 9: Employee Management & RBAC
+**Goal:** Manage staff access and shifts.
+- [ ] **Story 9.1:** As an owner, I can invite employees via email to join my organization.
+- [ ] **Story 9.2:** As an owner, I can assign Roles (Admin, Manager, Cashier) to restrict system access.
+- [ ] **Story 9.3:** As an employee, I can clock in and clock out to record my attendance.
+
+### SPRINT 10: Reports & Dashboard Intelligence
+**Goal:** Give business owners a bird's-eye view of their operations.
+- [ ] **Story 10.1:** As an owner, I can view my daily, weekly, and monthly sales graphs on the Dashboard.
+- [ ] **Story 10.2:** As an owner, I can see a "Low Stock Alerts" widget.
+- [ ] **Story 10.3:** As a manager, I can generate an end-of-day register closure report.
+- [ ] **Story 10.4:** As a manager, I can export reports to CSV or PDF.
+
+### SPRINT 11: Automation, Audit & AI
+**Goal:** Implement advanced features and security logging.
+- [ ] **Story 11.1:** As a system admin, I can view an Audit Log showing exactly who performed what action.
+- [ ] **Story 11.2:** As a user, I receive in-app Notifications for critical events (e.g., Stock out).
+- [ ] **Story 11.3:** As an owner, I can ask the AI Assistant natural language queries about my business data.
+
+### SPRINT 12: Production DevOps & SaaS Monetization
+**Goal:** Launch the platform globally.
+- [ ] **Story 12.1:** As a system admin, I can write Terraform scripts to provision Kubernetes clusters.
+- [ ] **Story 12.2:** As a system admin, I can setup Prometheus and Grafana for monitoring.
+- [ ] **Story 12.3:** As the platform owner, I can configure Stripe billing for different SaaS tiers (Basic, Pro, Enterprise).
+- [ ] **Story 12.4:** As the platform owner, I can use the Super Admin Panel to view overall platform health and tenant counts.
+
+---
+
+## 4. DEFINITION OF DONE (DoD)
+A User Story is only considered "Done" when:
+1. Code is fully implemented.
+2. Code passes TypeScript linting (`npx turbo run lint`).
+3. Code compiles successfully (`npx turbo run build`).
+4. Automated tests (Unit/Integration) are written and pass.
+5. Peer code review is completed.
+6. The feature is tested manually and meets all Acceptance Criteria.
+7. Feature is deployed to the staging environment without errors.
