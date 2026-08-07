@@ -101,9 +101,9 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 10: Reports & Dashboard Intelligence
 **Goal:** Give business owners a bird's-eye view of their operations.
-- [ ] **Story 10.1:** As an owner, I can view my daily, weekly, and monthly sales graphs on the Dashboard.
-- [ ] **Story 10.2:** As an owner, I can see a "Low Stock Alerts" widget.
-- [ ] **Story 10.3:** As a manager, I can generate an end-of-day register closure report.
+- [x] **Story 10.1:** As an owner, I can view my top-selling Products in a given date range.
+- [x] **Story 10.2:** As an owner, I can view low-stock alerts.
+- [x] **Story 10.3:** As an owner, I can view my overall profit margin across the business.
 - [ ] **Story 10.4:** As a manager, I can export reports to CSV or PDF.
 
 ### SPRINT 11: Automation, Audit & AI
