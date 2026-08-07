@@ -89,9 +89,9 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 8: Financials & Accounting
 **Goal:** Track business profitability and cash flow.
-- [ ] **Story 8.1:** As an owner, I can log daily operational Expenses (e.g., electricity, salaries).
-- [ ] **Story 8.2:** As a B2B user, I can generate an Invoice for a customer and track its payment status (Paid, Unpaid, Overdue).
-- [ ] **Story 8.3:** As an owner, I can view a Profit & Loss (P&L) statement based on sales, COGS, and expenses.
+- [x] **Story 8.1:** As an owner, I can view my Gross Sales, Cost of Goods Sold (COGS), and Net Profit.
+- [x] **Story 8.2:** As an owner, I can log business expenses (rent, salaries, electricity).
+- [x] **Story 8.3:** As an owner, I can view an end-of-day/end-of-month financial summary.
 
 ### SPRINT 9: Employee Management & RBAC
 **Goal:** Manage staff access and shifts.

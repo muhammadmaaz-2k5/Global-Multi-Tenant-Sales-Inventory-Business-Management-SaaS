@@ -53,6 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Suppliers', href: '/suppliers' },
     { name: 'Customers', href: '/customers' },
     { name: 'Purchase Orders', href: '/purchase-orders' },
+    { name: 'Expenses', href: '/expenses' },
     { name: 'Launch POS', href: '/pos' },
   ];
 
