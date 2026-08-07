@@ -11,10 +11,14 @@ import {
 import { PurchaseOrdersService } from './purchase-orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrgMemberGuard } from '../auth/org-member.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '@prisma/client';
 import { CreatePurchaseOrderDto } from './dto/purchase-orders.dto';
 import { Request } from 'express';
 
-@UseGuards(JwtAuthGuard, OrgMemberGuard)
+@UseGuards(JwtAuthGuard, OrgMemberGuard, RolesGuard)
+@Roles(Role.OWNER, Role.MANAGER)
 @Controller('organizations/:orgId/purchase-orders')
 export class PurchaseOrdersController {
   constructor(private readonly poService: PurchaseOrdersService) {}

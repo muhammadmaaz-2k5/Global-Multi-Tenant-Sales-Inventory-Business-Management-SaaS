@@ -55,6 +55,9 @@ export default function PosPage() {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'CUSTOM'>('CASH');
 
+  // Clock In State
+  const [isClockedIn, setIsClockedIn] = useState(false);
+
   useEffect(() => {
     async function init() {
       try {
@@ -74,6 +77,17 @@ export default function PosPage() {
           setCustomers(custs);
           if (locs.length > 0) {
             setSelectedLocationId(locs[0].id);
+          }
+
+          // Check shift status
+          try {
+            const shift = await fetchApi<{ id: string }>(`/organizations/${id}/shifts/active`);
+            if (shift && shift.id) {
+              setIsClockedIn(true);
+            }
+          } catch (e) {
+            // No active shift
+            setIsClockedIn(false);
           }
         }
       } catch (err) {
@@ -174,6 +188,22 @@ export default function PosPage() {
   const tax = subtotal * 0.08; // Fake 8% tax
   const total = subtotal + tax;
 
+  const toggleShift = async () => {
+    try {
+      if (isClockedIn) {
+        await fetchApi(`/organizations/${orgId}/shifts/clock-out`, { method: 'POST' });
+        setIsClockedIn(false);
+        alert('Clocked Out successfully');
+      } else {
+        await fetchApi(`/organizations/${orgId}/shifts/clock-in`, { method: 'POST' });
+        setIsClockedIn(true);
+        alert('Clocked In successfully');
+      }
+    } catch (err) {
+      alert('Failed to update shift status.');
+    }
+  };
+
   return (
     <div className="flex h-full relative">
       {/* LEFT PANEL: Products & Search */}
@@ -220,6 +250,13 @@ export default function PosPage() {
               ))}
             </select>
           </div>
+          
+          <Button 
+            variant={isClockedIn ? 'danger' : 'primary'} 
+            onClick={toggleShift}
+          >
+            {isClockedIn ? 'Clock Out' : 'Clock In'}
+          </Button>
         </div>
         
         <div className="flex-1 p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-max">

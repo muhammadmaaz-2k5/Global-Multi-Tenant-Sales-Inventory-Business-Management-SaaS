@@ -18,6 +18,8 @@ import { CustomersModule } from './customers/customers.module';
 import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { StaffModule } from './staff/staff.module';
+import { ShiftsModule } from './shifts/shifts.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
     PurchaseOrdersModule,
     ExpensesModule,
     AnalyticsModule,
+    StaffModule,
+    ShiftsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,9 +11,13 @@ import {
 import { ExpensesService } from './expenses.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OrgMemberGuard } from '../auth/org-member.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '@prisma/client';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto/expenses.dto';
 
-@UseGuards(JwtAuthGuard, OrgMemberGuard)
+@UseGuards(JwtAuthGuard, OrgMemberGuard, RolesGuard)
+@Roles(Role.OWNER, Role.MANAGER)
 @Controller('organizations/:orgId/expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}

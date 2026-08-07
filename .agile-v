@@ -95,9 +95,9 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 9: Employee Management & RBAC
 **Goal:** Manage staff access and shifts.
-- [ ] **Story 9.1:** As an owner, I can invite employees via email to join my organization.
-- [ ] **Story 9.2:** As an owner, I can assign Roles (Admin, Manager, Cashier) to restrict system access.
-- [ ] **Story 9.3:** As an employee, I can clock in and clock out to record my attendance.
+- [x] **Story 9.1:** As an owner, I can invite a staff member and assign them a Role (Cashier, Manager).
+- [x] **Story 9.2:** As the system, I restrict access to Financials and Inventory adjustment based on Role.
+- [x] **Story 9.3:** As a cashier, I can Clock In / Clock Out to track my shifts.tendance.
 
 ### SPRINT 10: Reports & Dashboard Intelligence
 **Goal:** Give business owners a bird's-eye view of their operations.

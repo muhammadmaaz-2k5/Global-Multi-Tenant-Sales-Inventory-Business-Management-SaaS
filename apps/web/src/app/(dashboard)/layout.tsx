@@ -43,19 +43,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const activeClass = "bg-primary-50 text-primary-700 font-medium";
   const inactiveClass = "text-surface-600 hover:bg-surface-50 hover:text-surface-900";
 
-  const navItems = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Products', href: '/products' },
-    { name: 'Categories', href: '/categories' },
-    { name: 'Brands', href: '/brands' },
-    { name: 'Locations', href: '/locations' },
-    { name: 'Inventory', href: '/inventory' },
-    { name: 'Suppliers', href: '/suppliers' },
-    { name: 'Customers', href: '/customers' },
-    { name: 'Purchase Orders', href: '/purchase-orders' },
-    { name: 'Expenses', href: '/expenses' },
-    { name: 'Launch POS', href: '/pos' },
+  const role = user.memberships[0]?.role || 'CASHIER';
+
+  const baseNavItems = [
+    { name: 'Dashboard', href: '/dashboard', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+    { name: 'Products', href: '/products', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Categories', href: '/categories', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Brands', href: '/brands', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Locations', href: '/locations', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Inventory', href: '/inventory', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+    { name: 'Suppliers', href: '/suppliers', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Customers', href: '/customers', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+    { name: 'Purchase Orders', href: '/purchase-orders', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Expenses', href: '/expenses', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Staff', href: '/staff', roles: ['OWNER'] },
+    { name: 'Shifts', href: '/shifts', roles: ['OWNER', 'MANAGER'] },
+    { name: 'Launch POS', href: '/pos', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
   ];
+
+  const navItems = baseNavItems.filter(item => item.roles.includes(role));
 
   return (
     <div className="min-h-screen flex bg-surface-50">

@@ -19,6 +19,7 @@ model User {
   memberships   OrganizationMember[]
   posCarts      PosCart[]
   orders        Order[]
+  shifts        Shift[]
 }
 
 model Organization {
@@ -42,13 +43,20 @@ model Organization {
   customers     Customer[]
   purchaseOrders PurchaseOrder[]
   expenses      Expense[]
+  shifts        Shift[]
+}
+
+enum Role {
+  OWNER
+  MANAGER
+  CASHIER
 }
 
 model OrganizationMember {
   id              String       @id @default(uuid())
   userId          String
   organizationId  String
-  role            String       @default("VIEWER") // e.g., OWNER, ADMIN, MANAGER, VIEWER
+  role            Role         @default(CASHIER)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -337,4 +345,17 @@ model Expense {
   updatedAt      DateTime        @updatedAt
 
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Shift {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  clockIn        DateTime
+  clockOut       DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
