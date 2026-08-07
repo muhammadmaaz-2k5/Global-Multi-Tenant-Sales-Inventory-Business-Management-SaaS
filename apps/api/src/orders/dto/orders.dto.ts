@@ -39,4 +39,12 @@ export class CheckoutDto {
   @IsUUID()
   @IsOptional()
   posCartId?: string; // If this sale came from a suspended cart, we delete it
+
+  @IsNumber()
+  @IsOptional()
+  tax?: number;
+
+  @IsNumber()
+  @IsOptional()
+  discount?: number;
 }

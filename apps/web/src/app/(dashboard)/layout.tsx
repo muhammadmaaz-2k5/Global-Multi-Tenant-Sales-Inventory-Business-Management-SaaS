@@ -9,6 +9,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  isSuperAdmin: boolean;
   memberships: { organizationId: string; role: string; organization: { id: string; name: string } }[];
 }
 
@@ -59,11 +60,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Staff', href: '/staff', roles: ['OWNER'] },
     { name: 'Shifts', href: '/shifts', roles: ['OWNER', 'MANAGER'] },
     { name: 'Audit Logs', href: '/audit-logs', roles: ['OWNER'] },
+    { name: 'Settings', href: '/settings', roles: ['OWNER'] },
     { name: 'AI Assistant', href: '/assistant', roles: ['OWNER', 'MANAGER'] },
     { name: 'Launch POS', href: '/pos', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
   ];
 
   const navItems = baseNavItems.filter(item => item.roles.includes(role));
+
+  if (user.isSuperAdmin) {
+    navItems.unshift({ name: 'Super Admin Portal', href: '/admin', roles: ['OWNER'] });
+  }
 
   return (
     <div className="min-h-screen flex bg-surface-50">
@@ -76,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-4 border-b border-surface-200">
           <div className="text-xs font-semibold text-surface-500 uppercase tracking-wider mb-2">Organization</div>
           <div className="font-medium text-surface-900 truncate">
-            {currentOrg?.name || 'No Organization'}
+            {user.isSuperAdmin ? 'ShopFlow Admin' : (currentOrg?.name || 'No Organization')}
           </div>
         </div>
 

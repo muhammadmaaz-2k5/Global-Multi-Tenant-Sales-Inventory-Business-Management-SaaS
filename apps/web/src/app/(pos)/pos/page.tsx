@@ -43,8 +43,8 @@ export default function PosPage() {
   const router = useRouter();
   const [orgId, setOrgId] = useState<string>('');
   const [locations, setLocations] = useState<Location[]>([]);
-  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,10 +53,12 @@ export default function PosPage() {
 
   // Pay Modal State
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'CUSTOM'>('CASH');
+  const [paymentMethod, setPaymentMethod] = useState('CASH');
 
   // Clock In State
   const [isClockedIn, setIsClockedIn] = useState(false);
+  const [taxRate, setTaxRate] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
 
   useEffect(() => {
     async function init() {
@@ -66,6 +68,9 @@ export default function PosPage() {
         if (id) {
           setOrgId(id);
           
+          const orgRes = await fetchApi<{ defaultTaxRate?: number }>(`/organizations/${id}`);
+          setTaxRate(orgRes.defaultTaxRate || 0);
+
           const [prods, locs, custs] = await Promise.all([
             fetchApi<Product[]>(`/organizations/${id}/products`),
             fetchApi<Location[]>(`/organizations/${id}/locations`),
@@ -107,6 +112,54 @@ export default function PosPage() {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+      const currentTime = Date.now();
+      if (currentTime - lastKeyTime > 50) barcodeBuffer = '';
+      lastKeyTime = currentTime;
+
+      if (e.key === 'Enter' && barcodeBuffer.length > 3) {
+        const scannedCode = barcodeBuffer;
+        barcodeBuffer = '';
+        if (!orgId) return;
+        try {
+          const prods = await fetchApi<Product[]>(`/organizations/${orgId}/products?q=${encodeURIComponent(scannedCode)}`);
+          if (prods.length > 0 && prods[0].variants.length > 0) {
+            const product = prods[0];
+            const variant = prods[0].variants[0];
+            const price = variant.price ?? product.basePrice;
+            setCart((prev) => {
+              const existing = prev.find((i) => i.variantId === variant.id);
+              if (existing) {
+                return prev.map((i) => i.variantId === variant.id ? { ...i, quantity: i.quantity + 1 } : i);
+              }
+              return [...prev, {
+                variantId: variant.id,
+                name: `${product.name} - ${variant.name}`,
+                unitPrice: price,
+                quantity: 1,
+                discount: 0,
+              }];
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [orgId]);
 
   const addToCart = (product: Product, variant: Variant) => {
     const price = variant.price ?? product.basePrice;
@@ -170,10 +223,13 @@ export default function PosPage() {
           paymentMethod,
           items: cart,
           customerId: selectedCustomerId || undefined,
+          tax,
+          discount: cartDiscountAmount,
         }),
       });
       
       setCart([]);
+      setDiscountPercent(0);
       setIsPayModalOpen(false);
       
       // Navigate to receipt
@@ -185,8 +241,9 @@ export default function PosPage() {
   };
 
   const subtotal = cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity) - item.discount, 0);
-  const tax = subtotal * 0.08; // Fake 8% tax
-  const total = subtotal + tax;
+  const cartDiscountAmount = (subtotal * discountPercent) / 100;
+  const tax = (subtotal - cartDiscountAmount) * (taxRate / 100);
+  const total = subtotal - cartDiscountAmount + tax;
 
   const toggleShift = async () => {
     try {
@@ -311,16 +368,42 @@ export default function PosPage() {
           )}
         </div>
 
-        <div className="p-4 border-t border-surface-200 bg-surface-50 space-y-3">
-          <div className="flex justify-between text-surface-500">
+        {/* Discount Section */}
+        <div className="flex justify-between items-center px-4 py-2 bg-surface-50 border-t border-surface-200">
+          <span className="text-sm font-medium text-surface-600">Apply Discount</span>
+          <div className="flex gap-2">
+            {[0, 5, 10, 15, 20].map(pct => (
+              <button
+                key={pct}
+                onClick={() => setDiscountPercent(pct)}
+                className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                  discountPercent === pct 
+                    ? 'bg-primary-100 text-primary-700 border-primary-300' 
+                    : 'bg-white text-surface-600 border-surface-200 hover:bg-surface-100'
+                }`}
+              >
+                {pct}%
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-4 bg-surface-50 border-t border-surface-200 space-y-2">
+          <div className="flex justify-between text-surface-600">
             <span>Subtotal</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-surface-500">
-            <span>Tax (8%)</span>
+          {cartDiscountAmount > 0 && (
+            <div className="flex justify-between text-green-600 font-medium">
+              <span>Discount ({discountPercent}%)</span>
+              <span>-${cartDiscountAmount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-surface-600">
+            <span>Tax ({taxRate}%)</span>
             <span>${tax.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold text-surface-900 pt-2 border-t border-surface-200">
+          <div className="flex justify-between text-xl font-bold text-surface-900 pt-2 border-t border-surface-200 mt-2">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>

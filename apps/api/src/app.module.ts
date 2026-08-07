@@ -23,6 +23,7 @@ import { ShiftsModule } from './shifts/shifts.module';
 import { AuditModule } from './audit/audit.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AiModule } from './ai/ai.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AiModule } from './ai/ai.module';
     AuditModule,
     NotificationsModule,
     AiModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

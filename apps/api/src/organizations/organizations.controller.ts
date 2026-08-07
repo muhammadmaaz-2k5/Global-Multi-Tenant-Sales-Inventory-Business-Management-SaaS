@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  Param,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 
 interface AuthenticatedRequest extends ExpressRequest {
@@ -26,5 +34,14 @@ export class OrganizationsController {
     @Request() req: AuthenticatedRequest,
   ) {
     return this.orgService.getOrganizationDetails(orgId, req.user.sub);
+  }
+
+  @Patch(':id/settings')
+  async updateSettings(
+    @Param('id') orgId: string,
+    @Body() body: { defaultTaxRate?: number },
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.orgService.updateSettings(orgId, req.user.sub, body);
   }
 }

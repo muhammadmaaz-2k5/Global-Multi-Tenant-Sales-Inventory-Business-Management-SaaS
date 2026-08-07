@@ -60,4 +60,36 @@ export class OrganizationsService {
 
     return org;
   }
+
+  async updateSettings(
+    orgId: string,
+    userId: string,
+    data: { defaultTaxRate?: number },
+  ) {
+    // Only owners should ideally do this, but we'll let OrgMemberGuard + RolesGuard handle it in the controller if needed.
+    // For now, just basic membership check.
+    const membership = await this.prisma.client.organizationMember.findUnique({
+      where: {
+        userId_organizationId: {
+          userId,
+          organizationId: orgId,
+        },
+      },
+    });
+
+    if (!membership || membership.role !== 'OWNER') {
+      throw new ForbiddenException(
+        'Only owners can update organization settings.',
+      );
+    }
+
+    return this.prisma.client.organization.update({
+      where: { id: orgId },
+      data: {
+        ...(data.defaultTaxRate !== undefined && {
+          defaultTaxRate: data.defaultTaxRate,
+        }),
+      },
+    });
+  }
 }

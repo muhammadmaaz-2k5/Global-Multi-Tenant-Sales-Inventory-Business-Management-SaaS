@@ -18,8 +18,9 @@ export class OrdersService {
         acc + item.unitPrice * item.quantity - (item.discount || 0),
       0,
     );
-    const tax = subtotal * 0.08; // Simple hardcoded 8% tax for now
-    const total = subtotal + tax;
+    const tax = dto.tax ?? 0;
+    const discount = dto.discount ?? 0;
+    const total = subtotal + tax - discount;
 
     // 2. Perform everything in a single transaction
     return this.prisma.client.$transaction(async (tx) => {
@@ -32,6 +33,7 @@ export class OrdersService {
           paymentMethod: dto.paymentMethod,
           subtotal,
           tax,
+          discount,
           total,
           status: OrderStatus.COMPLETED,
           items: {

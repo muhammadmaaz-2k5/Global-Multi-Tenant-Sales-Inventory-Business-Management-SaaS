@@ -13,7 +13,13 @@ export class UsersService {
         email: true,
         firstName: true,
         lastName: true,
+        isSuperAdmin: true,
         createdAt: true,
+        memberships: {
+          include: {
+            organization: true
+          }
+        }
       },
     });
 

@@ -6,7 +6,10 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
   public client: Redis;
 
   onModuleInit() {
-    this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      maxRetriesPerRequest: null,
+      retryStrategy: () => null, // Disable retries if disconnected
+    });
   }
 
   onModuleDestroy() {

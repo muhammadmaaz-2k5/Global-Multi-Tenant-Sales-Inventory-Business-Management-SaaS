@@ -15,13 +15,17 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await performLogin(email, password);
+  };
+
+  const performLogin = async (e: string, p: string) => {
     setError('');
     setIsLoading(true);
 
     try {
       const data = await fetchApi<{ access_token: string }>('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: e, password: p }),
       });
 
       // Set cookie to expire in 7 days
@@ -33,6 +37,18 @@ export default function LoginPage() {
       setError(errorMsg);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const devQuickLogin = (role: 'admin' | 'tenant') => {
+    if (role === 'admin') {
+      setEmail('admin@shopflow.app');
+      setPassword('password123');
+      performLogin('admin@shopflow.app', 'password123');
+    } else {
+      setEmail('owner@techstore.com');
+      setPassword('password123');
+      performLogin('owner@techstore.com', 'password123');
     }
   };
 
@@ -86,10 +102,20 @@ export default function LoginPage() {
           </form>
           
           <div className="mt-6 text-center text-sm text-surface-500">
-            Don&apos;t have an account?{' '}
-            <a href="/register" className="font-medium text-primary-600 hover:text-primary-500">
-              Register your business
-            </a>
+            For business access, contact <a href="mailto:sales@shopflow.app" className="font-medium text-primary-600 hover:text-primary-500">sales@shopflow.app</a>
+          </div>
+
+          {/* DEV ONLY - QUICK LOGIN */}
+          <div className="mt-8 pt-6 border-t border-surface-200">
+            <p className="text-xs font-semibold text-surface-500 mb-3 text-center uppercase tracking-wider">Dev Quick Login (Testing Only)</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" size="sm" type="button" onClick={() => devQuickLogin('admin')}>
+                Log in as Super Admin
+              </Button>
+              <Button variant="outline" size="sm" type="button" onClick={() => devQuickLogin('tenant')}>
+                Log in as Tenant Owner
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -22,6 +22,7 @@ interface Order {
   paymentMethod: string;
   subtotal: number;
   tax: number;
+  discount: number;
   total: number;
   createdAt: string;
   items: OrderItem[];
@@ -45,6 +46,19 @@ export default function ReceiptPage() {
   
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState(false);
+  const [isRefunding, setIsRefunding] = useState(false);
+  const [userRole, setUserRole] = useState<string>('CASHIER');
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const user = await fetchApi<{ memberships: { organizationId: string, role: string }[] }>('/users/me');
+        const role = user.memberships.find(m => m.organizationId === orgId)?.role || 'CASHIER';
+        setUserRole(role);
+      } catch {}
+    }
+    init();
+  }, [orgId]);
 
   useEffect(() => {
     async function loadOrder() {
@@ -72,20 +86,70 @@ export default function ReceiptPage() {
     return <div className="flex h-full items-center justify-center">Loading receipt...</div>;
   }
 
+  const handleRefund = async () => {
+    if (!confirm('Are you sure you want to refund this order? This will restock the inventory automatically.')) return;
+    setIsRefunding(true);
+    try {
+      await fetchApi(`/organizations/${orgId}/orders/${id}/refund`, {
+        method: 'POST'
+      });
+      setOrder({ ...order, status: 'REFUNDED' });
+      alert('Order successfully refunded!');
+    } catch (err: unknown) {
+      alert((err as Error).message || 'Refund failed');
+    } finally {
+      setIsRefunding(false);
+    }
+  };
+
   return (
-    <div className="h-full bg-surface-100 flex items-center justify-center p-4">
-      
-      <div className="flex flex-col items-center gap-6">
-        
-        <div className="flex gap-4 print:hidden">
-          <Button variant="outline" onClick={() => router.push('/pos')}>New Sale</Button>
-          <Button onClick={() => window.print()}>Print Receipt</Button>
+    <div className="min-h-screen bg-surface-50 p-8 print:p-0 print:bg-white flex justify-center">
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          @page {
+            margin: 0;
+            size: 80mm 297mm;
+          }
+          body {
+            background-color: #fff;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .receipt-container {
+            width: 80mm !important;
+            padding: 4mm !important;
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            font-size: 12px;
+            color: #000;
+          }
+        }
+      `}} />
+      <div className="max-w-md w-full">
+        {/* Action Bar (hidden when printing) */}
+        <div className="flex justify-between mb-4 no-print">
+          <Button variant="outline" onClick={() => router.push('/pos')}>Back to POS</Button>
+          <div className="flex gap-2">
+            <Button onClick={() => window.print()}>Print Receipt</Button>
+            {(userRole === 'OWNER' || userRole === 'MANAGER') && order.status !== 'REFUNDED' && (
+              <Button variant="danger" onClick={handleRefund} disabled={isRefunding}>{isRefunding ? 'Refunding...' : 'Process Refund'}</Button>
+            )}
+          </div>
         </div>
-        
-        {/* RECEIPT PAPER - Styled for ~80mm width thermal printers conceptually, using standard max-width here */}
-        <div className="bg-white p-8 max-w-[400px] w-full shadow-lg border-t-4 border-t-surface-900 text-surface-900 print:shadow-none print:border-none print:max-w-full">
+
+        {/* Receipt Paper */}
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-surface-200 receipt-container relative overflow-hidden">
+          {order.status === 'REFUNDED' && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-20">
+              <span className="text-red-600 font-black text-6xl transform -rotate-45 tracking-widest border-8 border-red-600 px-4 py-2">
+                REFUNDED
+              </span>
+            </div>
+          )}
           
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 relative">
             <h1 className="text-2xl font-black uppercase tracking-widest">{order.organization.name}</h1>
             <p className="text-sm font-medium">{order.location.name}</p>
             <p className="text-xs text-surface-500 mt-2">Cashier: {order.user.firstName} {order.user.lastName}</p>
@@ -113,6 +177,12 @@ export default function ReceiptPage() {
               <span>Subtotal</span>
               <span>${order.subtotal.toFixed(2)}</span>
             </div>
+            {order.discount > 0 && (
+              <div className="flex justify-between">
+                <span>Discount</span>
+                <span>-${order.discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Tax</span>
               <span>${order.tax.toFixed(2)}</span>

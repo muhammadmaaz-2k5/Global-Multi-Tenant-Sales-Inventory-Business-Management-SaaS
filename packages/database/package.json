@@ -7,11 +7,17 @@
     "@prisma/client": "^5.10.2"
   },
   "devDependencies": {
+    "@types/node": "^24.13.3",
     "prisma": "^5.10.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   },
   "scripts": {
     "generate": "prisma generate",
-    "push": "prisma db push"
+    "push": "prisma db push",
+    "seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }
