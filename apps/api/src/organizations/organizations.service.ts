@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -27,12 +31,27 @@ export class OrganizationsService {
     });
 
     if (!membership) {
-      throw new ForbiddenException('You do not have access to this organization.');
+      throw new ForbiddenException(
+        'You do not have access to this organization.',
+      );
     }
 
     const org = await this.prisma.client.organization.findUnique({
       where: { id: orgId },
-      include: { members: { include: { user: { select: { id: true, firstName: true, lastName: true, email: true } } } } },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!org) {
