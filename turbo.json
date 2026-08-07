@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
+    "generate": {
+      "dependsOn": ["^generate"],
+      "outputs": ["node_modules/.prisma/**"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
