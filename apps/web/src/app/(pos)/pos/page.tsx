@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/apiClient';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -18,6 +19,12 @@ interface Product {
   variants: Variant[];
 }
 
+interface Location {
+  id: string;
+  name: string;
+  type: string;
+}
+
 interface CartItem {
   variantId: string;
   name: string;
@@ -27,10 +34,18 @@ interface CartItem {
 }
 
 export default function PosPage() {
+  const router = useRouter();
   const [orgId, setOrgId] = useState<string>('');
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Pay Modal State
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'CUSTOM'>('CASH');
 
   useEffect(() => {
     async function init() {
@@ -39,8 +54,17 @@ export default function PosPage() {
         const id = user.memberships[0]?.organizationId;
         if (id) {
           setOrgId(id);
-          const prods = await fetchApi<Product[]>(`/organizations/${id}/products`);
+          
+          const [prods, locs] = await Promise.all([
+            fetchApi<Product[]>(`/organizations/${id}/products`),
+            fetchApi<Location[]>(`/organizations/${id}/locations`),
+          ]);
+          
           setProducts(prods);
+          setLocations(locs);
+          if (locs.length > 0) {
+            setSelectedLocationId(locs[0].id);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -108,16 +132,43 @@ export default function PosPage() {
     }
   };
 
+  const processCheckout = async () => {
+    if (!selectedLocationId) {
+      alert('Please select a location first');
+      return;
+    }
+    
+    try {
+      const order = await fetchApi<{ id: string }>(`/organizations/${orgId}/orders/checkout`, {
+        method: 'POST',
+        body: JSON.stringify({
+          locationId: selectedLocationId,
+          paymentMethod,
+          items: cart,
+        }),
+      });
+      
+      setCart([]);
+      setIsPayModalOpen(false);
+      
+      // Navigate to receipt
+      router.push(`/pos/receipt/${order.id}?orgId=${orgId}`);
+      
+    } catch {
+      alert('Checkout failed! Insufficient inventory or network error.');
+    }
+  };
+
   const subtotal = cart.reduce((acc, item) => acc + (item.unitPrice * item.quantity) - item.discount, 0);
   const tax = subtotal * 0.08; // Fake 8% tax
   const total = subtotal + tax;
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full relative">
       {/* LEFT PANEL: Products & Search */}
       <div className="flex-1 flex flex-col border-r border-surface-200 bg-surface-50">
-        <div className="p-4 bg-white border-b border-surface-200">
-          <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="p-4 bg-white border-b border-surface-200 flex items-center justify-between gap-4">
+          <form onSubmit={handleSearch} className="flex gap-2 flex-1">
             <div className="flex-1">
               <Input
                 label=""
@@ -129,6 +180,20 @@ export default function PosPage() {
             </div>
             <Button type="submit">Search</Button>
           </form>
+          
+          {/* Location Selector */}
+          <div className="shrink-0 flex items-center gap-2 bg-surface-100 p-2 rounded-lg border border-surface-200">
+            <span className="text-sm font-medium text-surface-600">Location:</span>
+            <select 
+              value={selectedLocationId}
+              onChange={(e) => setSelectedLocationId(e.target.value)}
+              className="bg-transparent border-none text-sm font-bold text-surface-900 focus:outline-none focus:ring-0"
+            >
+              {locations.map((loc) => (
+                <option key={loc.id} value={loc.id}>{loc.name} ({loc.type})</option>
+              ))}
+            </select>
+          </div>
         </div>
         
         <div className="flex-1 p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-max">
@@ -201,12 +266,46 @@ export default function PosPage() {
             <Button variant="outline" onClick={suspendSale} disabled={cart.length === 0}>
               Suspend Sale
             </Button>
-            <Button disabled={cart.length === 0} onClick={() => alert('Payment flow is next sprint!')}>
+            <Button disabled={cart.length === 0} onClick={() => setIsPayModalOpen(true)}>
               Pay Now
             </Button>
           </div>
         </div>
       </div>
+      
+      {/* PAY MODAL */}
+      {isPayModalOpen && (
+        <div className="absolute inset-0 bg-surface-900/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-surface-200">
+              <h2 className="text-2xl font-bold text-surface-900">Process Payment</h2>
+              <p className="text-surface-500">Total Amount Due: <span className="font-bold text-lg text-primary-600">${total.toFixed(2)}</span></p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div 
+                  onClick={() => setPaymentMethod('CASH')}
+                  className={`border-2 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all ${paymentMethod === 'CASH' ? 'border-primary-500 bg-primary-50' : 'border-surface-200 hover:border-surface-300'}`}
+                >
+                  <span className="font-bold text-lg">💵 Cash</span>
+                </div>
+                <div 
+                  onClick={() => setPaymentMethod('CARD')}
+                  className={`border-2 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all ${paymentMethod === 'CARD' ? 'border-primary-500 bg-primary-50' : 'border-surface-200 hover:border-surface-300'}`}
+                >
+                  <span className="font-bold text-lg">💳 Card</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-surface-200 bg-surface-50 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setIsPayModalOpen(false)}>Cancel</Button>
+              <Button onClick={processCheckout}>Confirm Payment</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -75,10 +75,10 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 6: Sales Transactions & Order Processing
 **Goal:** Finalize checkout and guarantee data consistency.
-- [ ] **Story 6.1:** As a cashier, I can accept payment via Cash, Card, or Custom method.
-- [ ] **Story 6.2:** As the system, I must decrement inventory atomically when a sale is completed.
-- [ ] **Story 6.3:** As a cashier, I can print or email a digital receipt.
-- [ ] **Story 6.4:** As a manager, I can process a refund and return items to inventory.
+- [x] **Story 6.1:** As a cashier, I can accept payment via Cash, Card, or Custom method.
+- [x] **Story 6.2:** As the system, I must decrement inventory atomically when a sale is completed.
+- [x] **Story 6.3:** As a cashier, I can print or email a digital receipt.
+- [x] **Story 6.4:** As a manager, I can process a refund and return items to inventory.
 
 ### SPRINT 7: Supply Chain & CRM
 **Goal:** Track who buys from the business and who the business buys from.

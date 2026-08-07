@@ -12,6 +12,7 @@ import { ProductsModule } from './products/products.module';
 import { LocationsModule } from './locations/locations.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { PosCartsModule } from './pos-carts/pos-carts.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PosCartsModule } from './pos-carts/pos-carts.module';
     LocationsModule,
     InventoryModule,
     PosCartsModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
