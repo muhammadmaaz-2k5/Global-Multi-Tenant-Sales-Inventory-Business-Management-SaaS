@@ -20,6 +20,8 @@ model User {
   posCarts      PosCart[]
   orders        Order[]
   shifts        Shift[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
 }
 
 model Organization {
@@ -44,6 +46,8 @@ model Organization {
   purchaseOrders PurchaseOrder[]
   expenses      Expense[]
   shifts        Shift[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
 }
 
 enum Role {
@@ -355,6 +359,33 @@ model Shift {
   clockOut       DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  action         String
+  entityType     String?
+  entityId       String?
+  details        Json?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  message        String
+  type           String
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)

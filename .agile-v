@@ -108,9 +108,9 @@ This document serves as the master Agile framework and Product Backlog for the *
 
 ### SPRINT 11: Automation, Audit & AI
 **Goal:** Implement advanced features and security logging.
-- [ ] **Story 11.1:** As a system admin, I can view an Audit Log showing exactly who performed what action.
-- [ ] **Story 11.2:** As a user, I receive in-app Notifications for critical events (e.g., Stock out).
-- [ ] **Story 11.3:** As an owner, I can ask the AI Assistant natural language queries about my business data.
+- [x] **Story 11.1:** As a system admin, I can view an Audit Log showing exactly who performed what action.
+- [x] **Story 11.2:** As a user, I receive in-app Notifications for critical events (e.g., Stock out).
+- [x] **Story 11.3:** As an owner, I can ask the AI Assistant natural language queries about my business data.
 
 ### SPRINT 12: Production DevOps & SaaS Monetization
 **Goal:** Launch the platform globally.

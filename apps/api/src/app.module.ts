@@ -20,6 +20,9 @@ import { ExpensesModule } from './expenses/expenses.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { StaffModule } from './staff/staff.module';
 import { ShiftsModule } from './shifts/shifts.module';
+import { AuditModule } from './audit/audit.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { ShiftsModule } from './shifts/shifts.module';
     AnalyticsModule,
     StaffModule,
     ShiftsModule,
+    AuditModule,
+    NotificationsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
