@@ -42,7 +42,7 @@ export default function AuditLogsPage() {
         <h1 className="text-2xl font-bold text-surface-900">System Audit Logs</h1>
       </div>
       
-      <div className="bg-white rounded-xl shadow-sm border border-surface-200">
+      <div className="bg-white/[0.02]/[0.02] rounded-xl shadow-sm border border-surface-200">
         <Table>
           <TableHeader>
             <TableRow>

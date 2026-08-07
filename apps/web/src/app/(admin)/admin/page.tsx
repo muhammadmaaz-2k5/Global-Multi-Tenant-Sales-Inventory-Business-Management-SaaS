@@ -124,7 +124,7 @@ export default function SuperAdminPage() {
                     <th className="p-4 font-semibold">Created</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-surface-100 bg-white">
+                <tbody className="divide-y divide-surface-100 bg-white/[0.02]/[0.02]">
                   {organizations.map(org => (
                     <tr key={org.id} className="hover:bg-surface-50 transition">
                       <td className="p-4 font-medium">{org.name}</td>

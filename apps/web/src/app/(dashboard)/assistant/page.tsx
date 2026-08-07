@@ -51,7 +51,7 @@ export default function AiAssistantPage() {
         <p className="text-surface-500">Ask questions about your data in plain English.</p>
       </div>
 
-      <div className="flex-1 bg-white rounded-xl shadow-sm border border-surface-200 flex flex-col overflow-hidden relative">
+      <div className="flex-1 bg-white/[0.02]/[0.02] rounded-xl shadow-sm border border-surface-200 flex flex-col overflow-hidden relative">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>

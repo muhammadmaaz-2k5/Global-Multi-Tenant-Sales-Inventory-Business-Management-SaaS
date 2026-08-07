@@ -1,30 +1,39 @@
+import { useAuthStore } from '../store/authStore';
+
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  // Try to get token if running in the browser
-  let token = '';
-  if (typeof document !== 'undefined') {
-    const cookies = document.cookie.split(';');
-    const authCookie = cookies.find((c) => c.trim().startsWith('shopflow_token='));
-    if (authCookie) {
-      token = authCookie.split('=')[1];
+interface FetchOptions extends RequestInit {
+  requireAuth?: boolean;
+}
+
+export async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
+  const { requireAuth = true, ...customConfig } = options;
+  const headers = new Headers(customConfig.headers);
+
+  if (!headers.has('Content-Type') && !(customConfig.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  // Inject Auth Token & Org ID from Zustand
+  if (requireAuth && typeof window !== 'undefined') {
+    const state = useAuthStore.getState();
+    if (state.token && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${state.token}`);
+    }
+    if (state.orgId && !headers.has('x-organization-id')) {
+      headers.set('x-organization-id', state.orgId);
     }
   }
 
-  const headers = new Headers(options.headers);
-  if (!headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-  if (token && !headers.has('Authorization')) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
+    ...customConfig,
     headers,
   });
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== 'undefined') {
+      useAuthStore.getState().logout();
+    }
     let errorMsg = response.statusText;
     try {
       const errorData = await response.json();
@@ -41,5 +50,7 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     return {} as T;
   }
 
-  return response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : ({} as T);
 }
+

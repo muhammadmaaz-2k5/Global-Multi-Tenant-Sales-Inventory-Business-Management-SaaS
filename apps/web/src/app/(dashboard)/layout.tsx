@@ -1,151 +1,115 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { fetchApi } from '@/lib/apiClient';
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isSuperAdmin: boolean;
-  memberships: { organizationId: string; role: string; organization: { id: string; name: string } }[];
-}
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  Package, 
+  ShoppingCart, 
+  Users, 
+  Settings,
+  Store,
+  Wallet,
+  Clock,
+  PieChart,
+  LogOut,
+  Truck,
+  Box
+} from 'lucide-react';
+import clsx from 'clsx';
+import { useAuthStore } from '@/store/authStore';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { logout, user } = useAuthStore();
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const data = await fetchApi<User>('/users/me');
-        setUser(data);
-      } catch {
-        // If not authenticated, redirect to login
-        router.push('/login');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadUser();
-  }, [router]);
-
-  if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-surface-50">Loading...</div>;
-  }
-
-  if (!user) return null;
-
-  const currentOrg = user.memberships[0]?.organization;
-  const activeClass = "bg-primary-50 text-primary-700 font-medium";
-  const inactiveClass = "text-surface-600 hover:bg-surface-50 hover:text-surface-900";
-
-  const role = user.memberships[0]?.role || 'CASHIER';
-
-  const baseNavItems = [
-    { name: 'Dashboard', href: '/dashboard', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-    { name: 'Products', href: '/products', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Categories', href: '/categories', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Brands', href: '/brands', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Locations', href: '/locations', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Inventory', href: '/inventory', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-    { name: 'Suppliers', href: '/suppliers', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Customers', href: '/customers', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
-    { name: 'Purchase Orders', href: '/purchase-orders', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Expenses', href: '/expenses', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Staff', href: '/staff', roles: ['OWNER'] },
-    { name: 'Shifts', href: '/shifts', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Audit Logs', href: '/audit-logs', roles: ['OWNER'] },
-    { name: 'Settings', href: '/settings', roles: ['OWNER'] },
-    { name: 'AI Assistant', href: '/assistant', roles: ['OWNER', 'MANAGER'] },
-    { name: 'Launch POS', href: '/pos', roles: ['OWNER', 'MANAGER', 'CASHIER'] },
+  const navigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'POS Terminal', href: '/pos', icon: Store },
+    { name: 'Sales & Orders', href: '/sales', icon: ShoppingCart },
+    { name: 'Inventory', href: '/inventory', icon: Package },
+    { name: 'Purchase Orders', href: '/purchase-orders', icon: Truck },
+    { name: 'Suppliers', href: '/suppliers', icon: Box },
+    { name: 'Expenses', href: '/expenses', icon: Wallet },
+    { name: 'Staff & Roles', href: '/staff', icon: Users },
+    { name: 'Timeclock', href: '/shifts', icon: Clock },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const navItems = baseNavItems.filter(item => item.roles.includes(role));
-
-  if (user.isSuperAdmin) {
-    navItems.unshift({ name: 'Super Admin Portal', href: '/admin', roles: ['OWNER'] });
-  }
-
   return (
-    <div className="min-h-screen flex bg-surface-50">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex overflow-hidden font-sans selection:bg-indigo-500/30">
+      
+      {/* Background Effects (Cursor style) */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[60%] bg-blue-500/10 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
+      </div>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-surface-200 flex flex-col hidden md:flex">
-        <div className="h-16 flex items-center px-6 border-b border-surface-200">
-          <h1 className="text-xl font-bold text-primary-900">ShopFlow</h1>
-        </div>
+      <div className="relative z-10 w-64 border-r border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl flex flex-col supports-[backdrop-filter]:bg-[#0a0a0a]/60">
         
-        <div className="p-4 border-b border-surface-200">
-          <div className="text-xs font-semibold text-surface-500 uppercase tracking-wider mb-2">Organization</div>
-          <div className="font-medium text-surface-900 truncate">
-            {user.isSuperAdmin ? 'ShopFlow Admin' : (currentOrg?.name || 'No Organization')}
+        <div className="h-16 flex items-center px-6 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <span className="font-bold text-white leading-none">S</span>
+            </div>
+            <span className="text-xl font-bold tracking-tight text-white">ShopFlow</span>
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1 scrollbar-hide">
+          {navigation.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            const Icon = item.icon;
+            
             return (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors ${
-                  isActive ? activeClass : inactiveClass
-                }`}
+                className={clsx(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium",
+                  isActive 
+                    ? "bg-white/[0.02]/10 text-white shadow-sm" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/[0.02]/5"
+                )}
               >
+                <Icon size={18} className={isActive ? "text-indigo-400" : "text-neutral-500"} />
                 {item.name}
-              </a>
+              </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-surface-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold">
-              {user.firstName[0]}{user.lastName[0]}
+        <div className="p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02]/5 border border-white/10 mb-4">
+            <div className="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+              {user?.firstName?.charAt(0) || 'U'}
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-surface-900">{user.firstName} {user.lastName}</p>
-              <button 
-                onClick={() => {
-                  document.cookie = 'shopflow_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-                  router.push('/login');
-                }}
-                className="text-xs text-red-600 hover:text-red-700 font-medium mt-0.5"
-              >
-                Sign out
-              </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-xs text-neutral-500 truncate">{user?.email}</p>
             </div>
           </div>
+          
+          <button 
+            onClick={logout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+          >
+            <LogOut size={16} /> Sign out
+          </button>
         </div>
-      </aside>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b border-surface-200 flex items-center justify-end px-6 relative">
-          <div className="flex items-center gap-4">
-            {/* Notification Bell mock */}
-            <button className="relative p-2 text-surface-500 hover:text-primary-600 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="md:hidden ml-4">
-              <h1 className="text-xl font-bold text-primary-900">ShopFlow</h1>
-            </div>
-          </div>
-        </header>
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-7xl mx-auto animate-fade-in">
-            {children}
-          </div>
+      {/* Main Content Area */}
+      <main className="relative z-10 flex-1 overflow-y-auto">
+        <div className="min-h-full">
+          {children}
         </div>
       </main>
+
     </div>
   );
 }
