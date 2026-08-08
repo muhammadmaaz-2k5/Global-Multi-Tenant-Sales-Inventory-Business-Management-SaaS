@@ -1,6 +1,6 @@
 import { useAuthStore } from '../store/authStore';
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://global-multi-tenant-sales-inventory.onrender.com';
 
 interface FetchOptions extends RequestInit {
   requireAuth?: boolean;
