@@ -3,7 +3,18 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REDIS_URL",
+        "PORT",
+        "NODE_ENV",
+        "SENTRY_DSN",
+        "SENTRY_AUTH_TOKEN",
+        "NEXT_PUBLIC_API_URL",
+        "CORS_ORIGIN"
+      ]
     },
     "generate": {
       "dependsOn": ["^generate"],
