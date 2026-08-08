@@ -9,9 +9,9 @@ async function bootstrap() {
   app.use(helmet());
   
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://app.shopflow.com', 'https://shopflow.com'] 
-      : 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN 
+      ? process.env.CORS_ORIGIN.split(',')
+      : ['http://localhost:3000'],
     credentials: true,
   });
   await app.listen(process.env.PORT ?? 3001);
