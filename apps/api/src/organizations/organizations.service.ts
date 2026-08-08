@@ -64,7 +64,7 @@ export class OrganizationsService {
   async updateSettings(
     orgId: string,
     userId: string,
-    data: { defaultTaxRate?: number },
+    data: { name?: string; defaultTaxRate?: number; currency?: string; timezone?: string },
   ) {
     // Only owners should ideally do this, but we'll let OrgMemberGuard + RolesGuard handle it in the controller if needed.
     // For now, just basic membership check.
@@ -86,9 +86,10 @@ export class OrganizationsService {
     return this.prisma.client.organization.update({
       where: { id: orgId },
       data: {
-        ...(data.defaultTaxRate !== undefined && {
-          defaultTaxRate: data.defaultTaxRate,
-        }),
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.defaultTaxRate !== undefined && { defaultTaxRate: data.defaultTaxRate }),
+        ...(data.currency !== undefined && { currency: data.currency }),
+        ...(data.timezone !== undefined && { timezone: data.timezone }),
       },
     });
   }

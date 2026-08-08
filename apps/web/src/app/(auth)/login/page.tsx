@@ -30,11 +30,15 @@ export default function LoginPage() {
         throw new Error(data.message || 'Login failed');
       }
 
-      setAuth(data.access_token, data.user, data.user.organizations[0]?.id || '');
+      setAuth(data.access_token, data.user || null, data.user?.memberships?.[0]?.organizationId || '');
 
       // Wait for the state to settle before navigating
       setTimeout(() => {
-        router.push('/dashboard');
+        if (data.user?.isSuperAdmin) {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       }, 100);
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -50,7 +54,6 @@ export default function LoginPage() {
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/20 blur-[120px] rounded-full mix-blend-screen" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-500/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
       </div>
 
       <div className="w-full max-w-md relative z-10">
@@ -78,7 +81,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/[0.02]/[0.03] border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                 placeholder="you@company.com"
               />
             </div>
@@ -90,7 +93,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/[0.02]/[0.03] border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -110,8 +113,38 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <div className="mt-8 text-center text-sm text-neutral-500">
-            For demo purposes, just click Sign In.
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-[#0a0a0a] text-neutral-500">Test Accounts</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('admin@shopflow.app');
+                  setPassword('password123');
+                }}
+                className="w-full inline-flex justify-center py-2 px-4 border border-white/10 rounded-xl shadow-sm bg-white/5 text-sm font-medium text-white hover:bg-white/10 transition-all"
+              >
+                Super Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('owner@techstore.com');
+                  setPassword('password123');
+                }}
+                className="w-full inline-flex justify-center py-2 px-4 border border-white/10 rounded-xl shadow-sm bg-white/5 text-sm font-medium text-white hover:bg-white/10 transition-all"
+              >
+                Tenant Owner
+              </button>
+            </div>
           </div>
         </form>
       </div>

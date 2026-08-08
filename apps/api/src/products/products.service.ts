@@ -99,4 +99,56 @@ export class ProductsService {
       where: { id },
     });
   }
+
+  async importCsv(orgId: string, file: any) {
+    const csvData = file.buffer.toString('utf-8');
+    const lines = csvData.split('\n').map((l: string) => l.trim()).filter(Boolean);
+    if (lines.length < 2) return []; // Only header or empty
+
+    const headers = lines[0].split(',').map((h: string) => h.trim().toLowerCase());
+    const nameIdx = headers.indexOf('name');
+    const priceIdx = headers.indexOf('price');
+    const skuIdx = headers.indexOf('sku');
+
+    if (nameIdx === -1) throw new Error('CSV must contain a "Name" column');
+
+    const productsToCreate: any[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim());
+      const name = cols[nameIdx];
+      const basePrice = priceIdx !== -1 ? parseFloat(cols[priceIdx]) || 0 : 0;
+      const sku = skuIdx !== -1 ? cols[skuIdx] : null;
+
+      if (!name) continue;
+
+      productsToCreate.push({
+        organizationId: orgId,
+        name,
+        basePrice,
+        sku,
+      });
+    }
+
+    if (productsToCreate.length === 0) return [];
+
+    await this.prisma.client.product.createMany({
+      data: productsToCreate,
+      skipDuplicates: true,
+    });
+
+    // Fetch the newly created ones
+    const newProductNames = productsToCreate.map(p => p.name);
+    return this.prisma.client.product.findMany({
+      where: {
+        organizationId: orgId,
+        name: { in: newProductNames }
+      },
+      include: {
+        variants: true,
+        category: true,
+        brand: true,
+      }
+    });
+  }
 }

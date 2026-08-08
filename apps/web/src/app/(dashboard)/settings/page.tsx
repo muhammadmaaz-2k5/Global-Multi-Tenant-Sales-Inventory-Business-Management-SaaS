@@ -5,13 +5,15 @@ import { fetchApi } from '@/lib/apiClient';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Building2, Calculator, Users, Save, CheckCircle2 } from 'lucide-react';
+import { Building2, Calculator, Users, Save, CheckCircle2, Globe } from 'lucide-react';
 import clsx from 'clsx';
 
 interface Organization {
   id: string;
   name: string;
   defaultTaxRate: number;
+  currency: string;
+  timezone: string;
 }
 
 export default function SettingsPage() {
@@ -21,9 +23,11 @@ export default function SettingsPage() {
   // Form State
   const [orgName, setOrgName] = useState<string>('');
   const [taxRate, setTaxRate] = useState<string>('');
+  const [currency, setCurrency] = useState<string>('USD');
+  const [timezone, setTimezone] = useState<string>('UTC');
   
   // UI State
-  const [activeTab, setActiveTab] = useState<'GENERAL' | 'TAXES' | 'TEAM'>('GENERAL');
+  const [activeTab, setActiveTab] = useState<'GENERAL' | 'GLOBALIZATION' | 'TAXES' | 'TEAM'>('GENERAL');
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -36,6 +40,8 @@ export default function SettingsPage() {
         setOrg(data);
         setOrgName(data.name || '');
         setTaxRate(data.defaultTaxRate?.toString() || '0');
+        setCurrency(data.currency || 'USD');
+        setTimezone(data.timezone || 'UTC');
       } catch (err) {
         console.error('Failed to load org settings:', err);
       }
@@ -56,7 +62,9 @@ export default function SettingsPage() {
         method: 'PATCH',
         body: JSON.stringify({ 
           name: orgName,
-          defaultTaxRate: parseFloat(taxRate) || 0 
+          defaultTaxRate: parseFloat(taxRate) || 0,
+          currency,
+          timezone
         })
       });
       setSuccessMsg('Settings updated successfully!');
@@ -67,6 +75,10 @@ export default function SettingsPage() {
       setLoading(false);
     }
   };
+
+  if (!orgId) {
+    return <div className="p-12 text-center text-neutral-500 font-bold">No organization assigned to this account.</div>;
+  }
 
   if (!org) {
     return (
@@ -79,6 +91,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'GENERAL', label: 'General', icon: Building2 },
+    { id: 'GLOBALIZATION', label: 'Globalization', icon: Globe },
     { id: 'TAXES', label: 'Tax & Compliance', icon: Calculator },
     { id: 'TEAM', label: 'Team', icon: Users },
   ] as const;
@@ -186,7 +199,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Footer / Actions */}
-            {(activeTab === 'GENERAL' || activeTab === 'TAXES') && (
+            {(activeTab === 'GENERAL' || activeTab === 'TAXES' || activeTab === 'GLOBALIZATION') && (
               <div className="p-6 bg-white/[0.02]/[0.01] border-t border-white/[0.05] flex items-center justify-between">
                 
                 <div className="flex-1">

@@ -39,7 +39,7 @@ export class OrganizationsController {
   @Patch(':id/settings')
   async updateSettings(
     @Param('id') orgId: string,
-    @Body() body: { defaultTaxRate?: number },
+    @Body() body: { name?: string; defaultTaxRate?: number; currency?: string; timezone?: string },
     @Request() req: AuthenticatedRequest,
   ) {
     return this.orgService.updateSettings(orgId, req.user.sub, body);

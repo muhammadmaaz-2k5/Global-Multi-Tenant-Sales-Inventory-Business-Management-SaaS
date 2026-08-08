@@ -8,7 +8,10 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto/products.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -30,6 +33,16 @@ export class ProductsController {
   @Get()
   findAll(@Param('orgId') orgId: string, @Query('q') q?: string) {
     return this.productsService.findAll(orgId, q);
+  }
+
+  @Post('import-csv')
+  @UseInterceptors(FileInterceptor('file'))
+  importCsv(
+    @Param('orgId') orgId: string,
+    @UploadedFile() file: any,
+  ) {
+    if (!file) throw new Error('No file uploaded');
+    return this.productsService.importCsv(orgId, file);
   }
 
   @Get(':id')

@@ -43,6 +43,10 @@ export default function AnalyticsDashboardPage() {
     loadData();
   }, [orgId]);
 
+  if (!orgId) {
+    return <div className="p-12 text-center text-neutral-500 font-bold">No organization assigned to this account.</div>;
+  }
+
   if (isLoading) {
     return (
       <div className="flex h-full min-h-[500px] items-center justify-center p-12 text-neutral-500 gap-3">
@@ -71,7 +75,7 @@ export default function AnalyticsDashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white/[0.02]/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <DollarSign size={64} className="text-emerald-500" />
           </div>
@@ -79,7 +83,7 @@ export default function AnalyticsDashboardPage() {
           <p className="text-3xl font-black text-white mt-2">${data.grossSales.toFixed(2)}</p>
         </div>
 
-        <div className="bg-white/[0.02]/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <PackageMinus size={64} className="text-amber-500" />
           </div>
@@ -87,7 +91,7 @@ export default function AnalyticsDashboardPage() {
           <p className="text-3xl font-black text-white mt-2">${data.cogs.toFixed(2)}</p>
         </div>
 
-        <div className="bg-white/[0.02]/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
+        <div className="bg-white/[0.02] rounded-2xl p-6 border border-white/10 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Activity size={64} className="text-red-500" />
           </div>
@@ -113,7 +117,7 @@ export default function AnalyticsDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Top Products */}
-        <div className="bg-white/[0.02]/[0.02] border border-white/10 rounded-2xl shadow-sm flex flex-col">
+        <div className="bg-white/[0.02] border border-white/10 rounded-2xl shadow-sm flex flex-col">
           <div className="p-6 border-b border-white/[0.05] flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
               <BarChart3 size={20} />
@@ -129,7 +133,7 @@ export default function AnalyticsDashboardPage() {
               <div className="space-y-5">
                 {data.topProducts.map((p, i) => (
                   <div key={p.id} className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-white/[0.02]/[0.04] text-neutral-500 font-black text-sm flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-white/[0.02] text-neutral-500 font-black text-sm flex items-center justify-center shrink-0">
                       #{i + 1}
                     </div>
                     <div className="flex-1">
@@ -137,7 +141,7 @@ export default function AnalyticsDashboardPage() {
                         <span className="font-bold text-white">{p.name}</span>
                         <span className="text-sm font-bold text-indigo-600">{p.quantitySold} units</span>
                       </div>
-                      <div className="w-full bg-white/[0.02]/[0.04] rounded-full h-2">
+                      <div className="w-full bg-white/[0.02] rounded-full h-2">
                         <div 
                           className="bg-indigo-500 h-2 rounded-full" 
                           style={{ width: `${(p.quantitySold / data.topProducts[0].quantitySold) * 100}%` }}
@@ -152,7 +156,7 @@ export default function AnalyticsDashboardPage() {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-white/[0.02]/[0.02] border border-white/10 rounded-2xl shadow-sm flex flex-col">
+        <div className="bg-white/[0.02] border border-white/10 rounded-2xl shadow-sm flex flex-col">
           <div className="p-6 border-b border-white/[0.05] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
@@ -172,7 +176,7 @@ export default function AnalyticsDashboardPage() {
             ) : (
               <div className="divide-y divide-white/[0.05] max-h-[300px] overflow-y-auto">
                 {data.lowStockAlerts.map((alert, i) => (
-                  <div key={i} className="p-4 hover:bg-white/[0.02]/[0.01] transition-colors flex items-center justify-between">
+                  <div key={i} className="p-4 hover:bg-white/[0.02] transition-colors flex items-center justify-between">
                     <div>
                       <p className="font-bold text-white">{alert.variantName}</p>
                       <p className="text-xs font-medium text-neutral-500 mt-0.5">{alert.locationName}</p>
@@ -186,7 +190,7 @@ export default function AnalyticsDashboardPage() {
               </div>
             )}
           </div>
-          <div className="p-4 border-t border-white/[0.05] bg-white/[0.02]/[0.01] text-center">
+          <div className="p-4 border-t border-white/[0.05] bg-white/[0.02] text-center">
             <Link href="/purchase-orders" className="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
               Create Purchase Order <ArrowRight size={14} />
             </Link>

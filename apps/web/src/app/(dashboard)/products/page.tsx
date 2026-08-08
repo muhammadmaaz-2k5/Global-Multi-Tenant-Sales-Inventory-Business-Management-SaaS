@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { fetchApi } from '@/lib/apiClient';
+import { useAuthStore } from '@/store/authStore';
 
 interface Category { id: string; name: string }
 interface Brand { id: string; name: string }
@@ -86,6 +87,34 @@ export default function ProductsPage() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !orgId) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setIsLoading(true);
+      
+      const token = useAuthStore.getState().token;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/organizations/${orgId}/products/import-csv`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      
+      if (!res.ok) throw new Error('Failed to upload');
+      const newProducts = await res.json();
+      setProducts([...newProducts, ...products]);
+      alert('CSV imported successfully!');
+    } catch {
+      alert('Failed to upload CSV');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
@@ -102,8 +131,43 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-surface-900">Products</h2>
-          <p className="text-surface-500 mt-1">Manage your product catalog and variants.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Products</h2>
+          <p className="text-neutral-500 mt-1">Manage your product catalog and variants.</p>
+        </div>
+        <div className="flex gap-3">
+          <Button variant="secondary" onClick={() => document.getElementById('csv-upload')?.click()}>
+            Upload CSV
+          </Button>
+          <input 
+            type="file" 
+            id="csv-upload" 
+            accept=".csv" 
+            className="hidden" 
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file || !orgId) return;
+              
+              const formData = new FormData();
+              formData.append('file', file);
+              
+              try {
+                const token = useAuthStore.getState().token;
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/organizations/${orgId}/products/import-csv`, {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${token}` },
+                  body: formData
+                });
+                if (!res.ok) throw new Error('Upload failed');
+                const newProducts = await res.json();
+                setProducts([...newProducts, ...products]);
+                alert('CSV imported successfully!');
+              } catch (err) {
+                alert('Failed to import CSV');
+              }
+              // Reset input
+              e.target.value = '';
+            }} 
+          />
         </div>
       </div>
 

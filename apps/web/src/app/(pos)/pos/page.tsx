@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/apiClient';
 import { usePosStore } from '@/store/posStore';
 import { useAuthStore } from '@/store/authStore';
-import { Search, MapPin, User as UserIcon, Plus, Minus, Trash2, CreditCard, Banknote, ShoppingBag } from 'lucide-react';
+import { Search, MapPin, User as UserIcon, Plus, Minus, Trash2, CreditCard, Banknote, ShoppingBag, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
@@ -46,7 +46,8 @@ export default function PosPage() {
   
   // Modals
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD'>('CASH');
+  const [cashAmount, setCashAmount] = useState<string>('');
+  const [cardAmount, setCardAmount] = useState<string>('');
 
   // Load Initial Data
   useEffect(() => {
@@ -109,7 +110,10 @@ export default function PosPage() {
         method: 'POST',
         body: JSON.stringify({
           locationId: posStore.locationId,
-          paymentMethod,
+          payments: [
+            ...(parseFloat(cashAmount) > 0 ? [{ method: 'CASH', amount: parseFloat(cashAmount) }] : []),
+            ...(parseFloat(cardAmount) > 0 ? [{ method: 'CARD', amount: parseFloat(cardAmount) }] : [])
+          ],
           items: posStore.cart,
           customerId: posStore.customerId || undefined,
           tax: posStore.getTax(),
@@ -119,6 +123,8 @@ export default function PosPage() {
       
       posStore.clearCart();
       setIsPayModalOpen(false);
+      setCashAmount('');
+      setCardAmount('');
       
       // Navigate to receipt
       router.push(`/pos/receipt/${order.id}?orgId=${orgId}`);
@@ -342,7 +348,11 @@ export default function PosPage() {
               Clear
             </button>
             <button 
-              onClick={() => setIsPayModalOpen(true)}
+              onClick={() => {
+                setCashAmount(total.toFixed(2));
+                setCardAmount('');
+                setIsPayModalOpen(true);
+              }}
               disabled={posStore.cart.length === 0}
               className="px-4 py-4 rounded-xl font-bold transition-all bg-indigo-500 text-white hover:bg-indigo-400 shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -375,34 +385,55 @@ export default function PosPage() {
                 <div className="text-4xl font-black text-indigo-400">${total.toFixed(2)}</div>
               </div>
               
-              <div className="p-8 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <button 
-                    onClick={() => setPaymentMethod('CASH')}
-                    className={clsx(
-                      "p-6 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all border-2",
-                      paymentMethod === 'CASH' 
-                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400" 
-                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:text-white"
-                    )}
-                  >
-                    <Banknote size={32} />
-                    <span className="font-bold">Cash</span>
-                  </button>
-                  
-                  <button 
-                    onClick={() => setPaymentMethod('CARD')}
-                    className={clsx(
-                      "p-6 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all border-2",
-                      paymentMethod === 'CARD' 
-                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-400" 
-                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:text-white"
-                    )}
-                  >
-                    <CreditCard size={32} />
-                    <span className="font-bold">Card</span>
-                  </button>
+              <div className="p-8 space-y-6">
+                <div className="text-sm text-slate-400 text-center -mt-4">
+                  Enter amounts to split payment, or pay in full with one method.
                 </div>
+                
+                <div className="space-y-4">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Banknote className="text-emerald-500" size={20} />
+                    </div>
+                    <input 
+                      type="number"
+                      step="0.01"
+                      placeholder="Cash Amount"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    />
+                  </div>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <CreditCard className="text-indigo-400" size={20} />
+                    </div>
+                    <input 
+                      type="number"
+                      step="0.01"
+                      placeholder="Card Amount"
+                      value={cardAmount}
+                      onChange={(e) => setCardAmount(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Validation calculation */}
+                {(() => {
+                   const csh = parseFloat(cashAmount) || 0;
+                   const crd = parseFloat(cardAmount) || 0;
+                   const sum = csh + crd;
+                   const remaining = total - sum;
+                   return remaining > 0.001 ? (
+                     <div className="text-amber-400 text-sm font-medium text-center">Remaining balance: ${remaining.toFixed(2)}</div>
+                   ) : remaining < -0.001 ? (
+                     <div className="text-emerald-400 text-sm font-medium text-center">Change due: ${Math.abs(remaining).toFixed(2)}</div>
+                   ) : (
+                     <div className="text-emerald-400 text-sm font-medium text-center flex items-center justify-center gap-1"><CheckCircle2 size={16}/> Fully covered</div>
+                   );
+                })()}
               </div>
               
               <div className="p-6 bg-slate-950/50 border-t border-white/10 flex justify-end gap-3">

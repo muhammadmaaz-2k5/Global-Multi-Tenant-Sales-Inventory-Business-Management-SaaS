@@ -30,7 +30,7 @@ export class OrdersService {
           organizationId: orgId,
           userId,
           locationId: dto.locationId,
-          paymentMethod: dto.paymentMethod,
+          paymentMethod: dto.payments?.length === 1 ? dto.payments[0].method : (dto.paymentMethod || 'CUSTOM'),
           subtotal,
           tax,
           discount,
@@ -44,6 +44,12 @@ export class OrdersService {
               discount: item.discount || 0,
             })),
           },
+          payments: {
+            create: dto.payments?.map(p => ({
+              method: p.method,
+              amount: p.amount
+            })) || [],
+          }
         },
         include: {
           items: true,
@@ -196,6 +202,7 @@ export class OrdersService {
           },
         },
         organization: true, // For receipt printing
+        payments: true,
       },
     });
     if (!order) throw new NotFoundException('Order not found');

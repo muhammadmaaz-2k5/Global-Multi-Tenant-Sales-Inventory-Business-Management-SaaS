@@ -43,9 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Background Effects (Cursor style) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[60%] bg-blue-500/10 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
+        <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-purple-500/10 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       {/* Sidebar */}
@@ -95,7 +94,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           
           <button 
-            onClick={logout}
+            onClick={() => {
+              logout();
+              window.location.href = '/login';
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
           >
             <LogOut size={16} /> Sign out

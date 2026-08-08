@@ -19,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { logout, user } = useAuthStore();
 
   const navigation = [
+    { name: 'Dashboard', href: '/admin', icon: Activity },
     { name: 'Organizations', href: '/admin/organizations', icon: Building2 },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'System Logs', href: '/admin/logs', icon: Activity },
@@ -30,9 +31,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       
       {/* Background Effects */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[20%] left-[-10%] w-[40%] h-[40%] bg-pink-500/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay" />
+        <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-purple-500/10 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       {/* Sidebar */}
@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1 scrollbar-hide">
           {navigation.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
             const Icon = item.icon;
             
             return (
@@ -72,7 +72,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="p-4 border-t border-white/10">
           <button 
-            onClick={logout}
+            onClick={() => {
+              logout();
+              window.location.href = '/login';
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
           >
             <LogOut size={16} /> Exit Admin

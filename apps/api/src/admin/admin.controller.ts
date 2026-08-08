@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ProvisionTenantDto } from './dto/admin.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -18,5 +18,25 @@ export class AdminController {
   @Post('organizations')
   provisionTenant(@Body() dto: ProvisionTenantDto) {
     return this.adminService.provisionTenant(dto);
+  }
+
+  @Get('users')
+  getUsers() {
+    return this.adminService.getUsers();
+  }
+
+  @Get('logs')
+  getLogs() {
+    return this.adminService.getLogs();
+  }
+
+  @Get('settings')
+  getSettings() {
+    return this.adminService.getSettings();
+  }
+
+  @Patch('settings')
+  updateSettings(@Body() dto: any) {
+    return this.adminService.updateSettings(dto);
   }
 }

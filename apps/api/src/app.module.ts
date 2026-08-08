@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { SentryModule, SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -24,9 +27,15 @@ import { AuditModule } from './audit/audit.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100, // 100 requests per IP per minute
+    }]),
     PrismaModule,
     AuthModule,
     OrganizationsModule,
@@ -50,8 +59,19 @@ import { AdminModule } from './admin/admin.module';
     NotificationsModule,
     AiModule,
     AdminModule,
+    StripeModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
 })
 export class AppModule {}

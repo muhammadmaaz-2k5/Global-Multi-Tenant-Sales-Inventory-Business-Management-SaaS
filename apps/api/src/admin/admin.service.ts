@@ -61,4 +61,35 @@ export class AdminService {
       return { success: true, orgId: org.id };
     });
   }
+
+  async getUsers() {
+    return this.prisma.client.user.findMany({
+      include: {
+        memberships: {
+          include: { organization: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getLogs() {
+    return this.prisma.client.auditLog.findMany({
+      include: { user: true, organization: true },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+  }
+
+  async getSettings() {
+    return {
+      maintenanceMode: false,
+      stripePublicKey: 'pk_test_shopflow_placeholder',
+      supportEmail: 'support@shopflow.app',
+    };
+  }
+
+  async updateSettings(dto: any) {
+    return { success: true, settings: dto };
+  }
 }

@@ -24,12 +24,27 @@ export class OrderItemDto {
   discount?: number;
 }
 
+export class OrderPaymentDto {
+  @IsEnum(PaymentMethod)
+  method: PaymentMethod;
+
+  @IsNumber()
+  amount: number;
+}
+
 export class CheckoutDto {
   @IsUUID()
   locationId: string;
 
+  @IsOptional()
   @IsEnum(PaymentMethod)
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderPaymentDto)
+  payments?: OrderPaymentDto[];
 
   @IsArray()
   @ValidateNested({ each: true })

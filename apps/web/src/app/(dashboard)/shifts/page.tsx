@@ -94,7 +94,7 @@ export default function ShiftsPage() {
                 <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500" />
                 <p className="font-bold text-white">{shift.user.firstName} {shift.user.lastName}</p>
                 <p className="text-sm text-neutral-500 mt-1 flex items-center gap-1">
-                  <MapPin size={14} /> {shift.location.name}
+                  <MapPin size={14} /> {shift.location?.name || 'Main Store'}
                 </p>
                 <p className="text-xs font-mono text-neutral-600 mt-3">
                   In: {new Date(shift.clockInTime).toLocaleTimeString()}
@@ -146,7 +146,7 @@ export default function ShiftsPage() {
                       <td className="px-6 py-4 font-bold text-neutral-300">
                         {shift.user.firstName} {shift.user.lastName}
                       </td>
-                      <td className="px-6 py-4">{shift.location.name}</td>
+                      <td className="px-6 py-4">{shift.location?.name || 'Main Store'}</td>
                       <td className="px-6 py-4 text-emerald-600 font-medium">
                         {inTime.toLocaleTimeString()}
                       </td>
